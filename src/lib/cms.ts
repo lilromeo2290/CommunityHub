@@ -9,6 +9,7 @@ export type ViewKey =
   | 'evaluation'
   | 'ai'
   | 'communication'
+  | 'users'
   | 'audit'
   | 'settings'
 
@@ -21,6 +22,7 @@ export const NAV_ITEMS: { key: ViewKey; label: string; description: string }[] =
   { key: 'evaluation', label: 'M&E', description: 'Monitoring & evaluation' },
   { key: 'ai', label: 'AI Insights', description: 'Smart recommendations' },
   { key: 'communication', label: 'Communication', description: 'Announcements' },
+  { key: 'users', label: 'Users & Roles', description: 'Accounts & permissions' },
   { key: 'audit', label: 'Audit Log', description: 'Security & activity' },
   { key: 'settings', label: 'Settings', description: 'Categories & config' },
 ]

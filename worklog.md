@@ -242,3 +242,66 @@ src/app/page.tsx               — Main page with view switching
 - The dark palette uses oklch with hue 162-165 (emerald range) at low chroma (0.008-0.02) so the background isn't pure gray — it has a faint green warmth that pairs with the emerald brand
 - Lightness 0.18 for background and 0.225 for cards makes it "a little dark" rather than pitch black (which would be 0.0)
 - All existing gradient brand colors (from-emerald-500 to-teal-600) work in both themes since they're saturated
+
+---
+
+## 2026-07-07 00:15 UTC — Users & Roles Management (Agent)
+
+**Commit**: (pending push)
+**Type**: feat
+**Scope**: users, roles, security
+
+### Changes
+- Built new `/api/users` CRUD route with full user management (GET, POST, PATCH, DELETE)
+- Added **last-admin protection**: cannot delete or demote the last active admin (prevents accidental lockout)
+- Added linked-member check: cannot delete a user whose account is linked to a member profile (must reassign member first)
+- Built new `UserManagementView` with two tabs:
+  - **User Accounts tab**: searchable/filterable table of all users with avatars, role badges, linked member info, active toggle, edit/delete buttons
+  - **Roles & Permissions tab**: 6 role cards showing active user counts and descriptions, plus a full permissions matrix showing which actions each role can perform across 6 categories (Members, Resources, Projects, Finance, Communication, Settings & Security)
+- Built Add User and Edit User dialogs with name, email, role selector, and active toggle
+- Built Delete User confirmation dialog with warnings about linked member profiles
+- Added "Users & Roles" nav item with UserCog icon
+- All user changes are recorded in the audit log
+- All UI components use `dark:` variants for proper dark mode support
+
+### Files
+- `src/app/api/users/route.ts` — NEW: Full CRUD API with last-admin protection
+- `src/components/cms/UserManagementView.tsx` — NEW: Users table + Roles & Permissions matrix
+- `src/lib/cms.ts` — Added 'users' to ViewKey and NAV_ITEMS
+- `src/components/cms/CmsShell.tsx` — Added UserCog icon import and case
+- `src/app/page.tsx` — Wire UserManagementView to 'users' view
+
+### Role & Permission Model
+
+Six roles with progressive permissions:
+
+1. **Administrator** (red) — Full system access including user management, settings, audit logs
+2. **Community Leader** (emerald) — Approve allocations, post announcements, manage members
+3. **Project Manager** (cyan) — Create/edit projects, update milestones, submit allocations
+4. **Finance Officer** (violet) — Record transactions, generate reports, view budgets
+5. **Volunteer** (amber) — View projects, submit feedback, update contributions
+6. **Community Member** (gray) — View dashboard, submit feedback, view announcements
+
+The permissions matrix displays 18 specific actions across 6 categories with checkmarks/X icons showing what each role can do.
+
+### Safety features
+- **Last-admin protection**: API blocks role change or deletion of the last active admin
+- **Linked member protection**: API blocks deletion of users with linked member profiles (must reassign member first)
+- **Email uniqueness**: API validates email uniqueness on create and update
+- **Role validation**: API only accepts the 6 defined roles
+- **Audit logging**: All create/update/delete operations recorded with user, action, and details
+
+### Verified via Agent Browser
+- Page loads with 15 users, 15 active, 1 admin, 1 volunteer (correct counts)
+- All users render in table with avatars, role badges, linked member info, active switches
+- Roles & Permissions tab shows all 6 role cards with active user counts
+- Permissions matrix renders 18 actions × 6 roles with checkmarks/X icons
+- Add User dialog accepts name, email, role selector, active toggle
+- Created "Test Admin" user with Leader role → appeared at top of table immediately
+- Edit User dialog opens pre-filled with existing user data
+- Delete button disabled for last admin with tooltip "Cannot delete last admin"
+
+### Notes
+- The 10 seeded community members all have role "member" (visible in the Roles & Permissions tab count)
+- The 5 staff users (admin, leader, project_manager, finance, volunteer) each have role-appropriate permissions
+- All user CRUD operations appear in the Audit Log view with user name, action, and timestamp

@@ -20,6 +20,7 @@ import {
   Megaphone,
   ShieldCheck,
   Settings,
+  UserCog,
 } from 'lucide-react'
 import { NAV_ITEMS, type ViewKey, classNames } from '@/lib/cms'
 import { Button } from '@/components/ui/button'
@@ -295,6 +296,7 @@ function ViewIcon({ view, active }: { view: ViewKey; active: boolean }) {
     case 'evaluation': return <ClipboardCheck className={cls} />
     case 'ai': return <Sparkles className={cls} />
     case 'communication': return <Megaphone className={cls} />
+    case 'users': return <UserCog className={cls} />
     case 'audit': return <ShieldCheck className={cls} />
     case 'settings': return <Settings className={cls} />
   }
