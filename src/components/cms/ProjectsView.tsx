@@ -30,6 +30,7 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle,
 } from '@/components/ui/sheet'
 import { formatCurrency, formatDate, formatRelative, classNames, STATUS_COLORS } from '@/lib/cms'
+import { useCategories } from '@/hooks/use-categories'
 import { toast } from 'sonner'
 
 interface Project {
@@ -400,6 +401,7 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
 
 function AddProjectDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)
+  const { categories } = useCategories('project')
   const [form, setForm] = useState({
     name: '', description: '', category: 'infrastructure', goal: '',
     budget: '', startDate: '', endDate: '', managerName: '', location: '', beneficiaries: '',
@@ -458,12 +460,13 @@ function AddProjectDialog({ onCreated }: { onCreated: () => void }) {
               <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="infrastructure">Infrastructure</SelectItem>
-                  <SelectItem value="health">Health</SelectItem>
-                  <SelectItem value="education">Education</SelectItem>
-                  <SelectItem value="environment">Environment</SelectItem>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="economic">Economic</SelectItem>
+                  {categories.length === 0 ? (
+                    <SelectItem value="infrastructure">Infrastructure</SelectItem>
+                  ) : (
+                    categories.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

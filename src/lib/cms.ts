@@ -10,6 +10,7 @@ export type ViewKey =
   | 'ai'
   | 'communication'
   | 'audit'
+  | 'settings'
 
 export const NAV_ITEMS: { key: ViewKey; label: string; description: string }[] = [
   { key: 'dashboard', label: 'Dashboard', description: 'Overview & analytics' },
@@ -21,6 +22,7 @@ export const NAV_ITEMS: { key: ViewKey; label: string; description: string }[] =
   { key: 'ai', label: 'AI Insights', description: 'Smart recommendations' },
   { key: 'communication', label: 'Communication', description: 'Announcements' },
   { key: 'audit', label: 'Audit Log', description: 'Security & activity' },
+  { key: 'settings', label: 'Settings', description: 'Categories & config' },
 ]
 
 export function formatCurrency(n: number): string {

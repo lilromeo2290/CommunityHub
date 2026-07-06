@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ROLE_LABELS, formatDate, formatRelative, classNames } from '@/lib/cms'
+import { useCategories } from '@/hooks/use-categories'
 import { toast } from 'sonner'
 
 interface Member {
@@ -49,8 +50,9 @@ export function MembersView() {
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<string>('')
+  const [category, setCategory] = useState<string>('all')
   const [open, setOpen] = useState(false)
+  const { categories } = useCategories('member')
 
   const load = () => {
     setLoading(true)
@@ -88,11 +90,9 @@ export function MembersView() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
-            <SelectItem value="leader">Leaders</SelectItem>
-            <SelectItem value="volunteer">Volunteers</SelectItem>
-            <SelectItem value="family">Families</SelectItem>
-            <SelectItem value="youth">Youth</SelectItem>
-            <SelectItem value="elder">Elders</SelectItem>
+            {categories.map(c => (
+              <SelectItem key={c.id} value={c.value}>{c.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -102,7 +102,7 @@ export function MembersView() {
               Add Member
             </Button>
           </DialogTrigger>
-          <AddMemberDialog onCreated={() => { setOpen(false); load() }} />
+          <AddMemberDialog onCreated={() => { setOpen(false); load() }} categories={categories} />
         </Dialog>
       </div>
 
@@ -232,7 +232,7 @@ function MemberCard({ member }: { member: Member }) {
   )
 }
 
-function AddMemberDialog({ onCreated }: { onCreated: () => void }) {
+function AddMemberDialog({ onCreated, categories }: { onCreated: () => void; categories: Array<{ value: string; label: string }> }) {
   const [form, setForm] = useState({
     fullName: '', gender: '', age: '', phone: '', address: '',
     category: 'general', skills: '', needs: '', householdSize: '1', email: '',
@@ -306,12 +306,13 @@ function AddMemberDialog({ onCreated }: { onCreated: () => void }) {
           <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
             <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="leader">Leader</SelectItem>
-              <SelectItem value="volunteer">Volunteer</SelectItem>
-              <SelectItem value="family">Family</SelectItem>
-              <SelectItem value="youth">Youth</SelectItem>
-              <SelectItem value="elder">Elder</SelectItem>
-              <SelectItem value="general">General</SelectItem>
+              {categories.length === 0 ? (
+                <SelectItem value="general">General</SelectItem>
+              ) : (
+                categories.map(c => (
+                  <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
         </div>

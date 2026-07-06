@@ -122,3 +122,77 @@ src/app/page.tsx               — Main page with view switching
 - Dev server runs on port 3000 via `bun run dev`
 - Lint must pass before commit: `bun run lint`
 - All views were verified working via Agent Browser before initial push
+
+---
+
+## 2026-07-06 23:35 UTC — Dynamic Category Manager (Agent)
+
+**Commit**: (pending push)
+**Type**: feat
+**Scope**: settings, all modules
+
+### Changes
+- Added new `Category` Prisma model with fields: id, type, value, label, color, icon, active, isSystem, sortOrder. Unique constraint on (type, value).
+- Built full CRUD API at `/api/categories` supporting GET (with optional type filter and includeInactive flag), POST (create), PATCH (update), DELETE (with system-category protection).
+- Seeded 30 default categories across 6 types: member (6), resource (6), project (6), announcement (4), feedback (4), transaction_type (4). All marked as `isSystem: true` so they cannot be deleted (only deactivated).
+- Built new `SettingsView` (Category Manager) with:
+  - Header banner explaining the feature
+  - 6 overview cards showing active/total counts per type
+  - Tabbed interface for each category type
+  - Per-category row with label, color badge, value code, system flag, sort order, created date
+  - Add Category dialog (label, value, type, color picker, sort order, active toggle)
+  - Edit Category dialog (same fields, type locked)
+  - Delete confirmation dialog (blocked for system categories)
+  - Toggle active/inactive via switch directly on row
+- Added new "Settings" sidebar nav item with gear icon
+- Created reusable `useCategories(type)` hook that fetches categories from the API
+- Updated ALL dialogs across 5 views to fetch categories dynamically instead of hardcoding:
+  - MembersView: filter dropdown + Add Member dialog category field
+  - ResourcesView: Add Resource dialog category field
+  - ProjectsView: Add Project dialog category field
+  - FinanceView: transaction type filter + Add Transaction dialog type field
+  - CommunicationView: Add Announcement dialog category field
+  - EvaluationView: Add Feedback dialog category field
+- Created standalone `scripts/seed-categories.ts` for idempotent category seeding (does not wipe other data)
+
+### Files
+- `prisma/schema.prisma` — Added Category model
+- `src/app/api/categories/route.ts` — NEW: Full CRUD API
+- `src/hooks/use-categories.ts` — NEW: Reusable fetch hook
+- `src/components/cms/SettingsView.tsx` — NEW: Category Manager UI
+- `src/lib/cms.ts` — Added 'settings' to ViewKey and NAV_ITEMS
+- `src/components/cms/CmsShell.tsx` — Added Settings import and icon
+- `src/app/page.tsx` — Wire SettingsView to 'settings' view
+- `src/components/cms/MembersView.tsx` — Dynamic categories in filter + dialog
+- `src/components/cms/ResourcesView.tsx` — Dynamic categories in Add Resource dialog
+- `src/components/cms/ProjectsView.tsx` — Dynamic categories in Add Project dialog
+- `src/components/cms/FinanceView.tsx` — Dynamic categories in filter + Add Transaction dialog
+- `src/components/cms/CommunicationView.tsx` — Dynamic categories in Add Announcement dialog
+- `src/components/cms/EvaluationView.tsx` — Dynamic categories in Add Feedback dialog
+- `scripts/seed.ts` — Updated to seed categories alongside other demo data
+- `scripts/seed-categories.ts` — NEW: Idempotent category-only seeder
+- `download/category-manager.png` — Screenshot of the new Settings page
+
+### How it works
+
+1. Admin clicks "Settings" in the sidebar → Category Manager page loads
+2. Six tabs let admin browse categories per module type (Members, Resources, Projects, Announcements, Feedback, Transaction Types)
+3. Each row shows the category with its color, value code, system flag, and sort order
+4. Admin can:
+   - **Add**: Click "Add Category" → fill label, value, type, color, sort order, active toggle
+   - **Edit**: Click pencil icon → same form pre-filled (type locked for existing categories)
+   - **Delete**: Click trash icon → confirmation dialog (system categories can only be deactivated, not deleted)
+   - **Deactivate/Activate**: Toggle the switch on any row to hide/show the category in dropdowns without deleting
+5. Changes take effect immediately across all module dialogs (Members, Resources, Projects, Finance, Communication, M&E)
+
+### Verified via Agent Browser
+- Settings page loads with 6/6 active categories for all 6 module types
+- All 6 member categories render with correct labels, colors, values, and system badges
+- Add Category dialog accepts all fields (label, value, type, color picker, sort order, active toggle)
+- Created "Disabled / PWD" category with rose color → appears at bottom of member list with delete button enabled (not system)
+- New category immediately appears in Members filter dropdown → confirms end-to-end dynamic flow works
+
+### Notes
+- The `isSystem` flag protects the 30 default categories from accidental deletion. Admins can still deactivate them to hide from dropdowns.
+- Categories already in use by records (e.g. a member with category="leader") will keep that raw value even if the category is deleted — they just won't show a friendly label in dropdowns anymore.
+- All category CRUD operations are recorded in the Audit Log.

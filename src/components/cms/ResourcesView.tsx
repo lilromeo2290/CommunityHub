@@ -27,6 +27,7 @@ import {
   Tabs, TabsList, TabsTrigger, TabsContent,
 } from '@/components/ui/tabs'
 import { formatRelative, classNames, STATUS_COLORS } from '@/lib/cms'
+import { useCategories } from '@/hooks/use-categories'
 import { toast } from 'sonner'
 
 interface Resource {
@@ -420,6 +421,7 @@ function AllocationRow({
 
 function AddResourceDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)
+  const { categories } = useCategories('resource')
   const [form, setForm] = useState({
     name: '', category: 'food', unit: 'unit', quantity: '', threshold: '',
     location: '', description: '',
@@ -474,12 +476,13 @@ function AddResourceDialog({ onCreated }: { onCreated: () => void }) {
               <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fund">Fund</SelectItem>
-                  <SelectItem value="food">Food</SelectItem>
-                  <SelectItem value="medicine">Medicine</SelectItem>
-                  <SelectItem value="equipment">Equipment</SelectItem>
-                  <SelectItem value="material">Material</SelectItem>
-                  <SelectItem value="human">Human Resource</SelectItem>
+                  {categories.length === 0 ? (
+                    <SelectItem value="food">Food</SelectItem>
+                  ) : (
+                    categories.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

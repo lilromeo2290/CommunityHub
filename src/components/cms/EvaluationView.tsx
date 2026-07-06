@@ -23,6 +23,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
 } from '@/components/ui/dialog'
 import { formatRelative, classNames } from '@/lib/cms'
+import { useCategories } from '@/hooks/use-categories'
 import { toast } from 'sonner'
 
 interface FeedbackEntry {
@@ -377,6 +378,7 @@ function FeedbackRow({ feedback, onAddressed }: { feedback: FeedbackEntry; onAdd
 
 function AddFeedbackDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)
+  const { categories } = useCategories('feedback')
   const [form, setForm] = useState({ rating: '5', category: 'general', content: '', projectId: '' })
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([])
   const [saving, setSaving] = useState(false)
@@ -444,10 +446,13 @@ function AddFeedbackDialog({ onCreated }: { onCreated: () => void }) {
               <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="project">Project</SelectItem>
-                  <SelectItem value="resource">Resource</SelectItem>
-                  <SelectItem value="leadership">Leadership</SelectItem>
+                  {categories.length === 0 ? (
+                    <SelectItem value="general">General</SelectItem>
+                  ) : (
+                    categories.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

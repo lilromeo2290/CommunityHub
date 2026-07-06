@@ -11,6 +11,7 @@ import { EvaluationView } from '@/components/cms/EvaluationView'
 import { AiInsightsView } from '@/components/cms/AiInsightsView'
 import { CommunicationView } from '@/components/cms/CommunicationView'
 import { AuditView } from '@/components/cms/AuditView'
+import { SettingsView } from '@/components/cms/SettingsView'
 import type { ViewKey } from '@/lib/cms'
 
 export default function Home() {
@@ -38,6 +39,7 @@ export default function Home() {
       {view === 'ai' && <AiInsightsView />}
       {view === 'communication' && <CommunicationView />}
       {view === 'audit' && <AuditView />}
+      {view === 'settings' && <SettingsView />}
     </CmsShell>
   )
 }

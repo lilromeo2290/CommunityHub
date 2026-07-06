@@ -27,6 +27,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import { formatCurrency, formatDate, classNames } from '@/lib/cms'
+import { useCategories } from '@/hooks/use-categories'
 import { toast } from 'sonner'
 
 interface Transaction {
@@ -67,8 +68,9 @@ const PIE_COLORS = ['#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#8b5cf6', '#ec4
 export function FinanceView() {
   const [data, setData] = useState<FinanceData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('')
+  const [filter, setFilter] = useState('all')
   const [refreshKey, setRefreshKey] = useState(0)
+  const { categories } = useCategories('transaction_type')
 
   const refresh = () => {
     setLoading(true)
@@ -221,10 +223,9 @@ export function FinanceView() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All types</SelectItem>
-                  <SelectItem value="income">Income</SelectItem>
-                  <SelectItem value="donation">Donation</SelectItem>
-                  <SelectItem value="grant">Grant</SelectItem>
-                  <SelectItem value="expense">Expense</SelectItem>
+                  {categories.map(c => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <AddTransactionDialog onCreated={refresh} />
@@ -336,6 +337,7 @@ export function FinanceView() {
 
 function AddTransactionDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)
+  const { categories } = useCategories('transaction_type')
   const [form, setForm] = useState({
     type: 'expense', category: 'supplies', amount: '', description: '',
     source: '', date: '',
@@ -386,10 +388,16 @@ function AddTransactionDialog({ onCreated }: { onCreated: () => void }) {
               <Select value={form.type} onValueChange={v => setForm({ ...form, type: v })}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="income">Income</SelectItem>
-                  <SelectItem value="donation">Donation</SelectItem>
-                  <SelectItem value="grant">Grant</SelectItem>
-                  <SelectItem value="expense">Expense</SelectItem>
+                  {categories.length === 0 ? (
+                    <>
+                      <SelectItem value="income">Income</SelectItem>
+                      <SelectItem value="expense">Expense</SelectItem>
+                    </>
+                  ) : (
+                    categories.map(c => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

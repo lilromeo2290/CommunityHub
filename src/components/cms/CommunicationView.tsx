@@ -18,6 +18,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { formatRelative, classNames } from '@/lib/cms'
+import { useCategories } from '@/hooks/use-categories'
 import { toast } from 'sonner'
 
 interface Announcement {
@@ -175,6 +176,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
 
 function AddAnnouncementDialog({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)
+  const { categories } = useCategories('announcement')
   const [form, setForm] = useState({ title: '', content: '', category: 'general', pinned: false })
   const [saving, setSaving] = useState(false)
 
@@ -225,10 +227,13 @@ function AddAnnouncementDialog({ onCreated }: { onCreated: () => void }) {
             <Select value={form.category} onValueChange={v => setForm({ ...form, category: v })}>
               <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="urgent">Urgent</SelectItem>
-                <SelectItem value="event">Event</SelectItem>
-                <SelectItem value="meeting">Meeting</SelectItem>
+                {categories.length === 0 ? (
+                  <SelectItem value="general">General</SelectItem>
+                ) : (
+                  categories.map(c => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
