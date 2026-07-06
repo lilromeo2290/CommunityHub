@@ -50,5 +50,10 @@ test
 prompt
 
 server.log
-# Skills directory
+
+# Skills directory (local skill cache, not part of project)
 /skills/
+
+# runtime pid files
+*.pid
+.zscripts/dev.pid
