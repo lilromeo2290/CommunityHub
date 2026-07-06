@@ -33,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 // Browser-only online status via useSyncExternalStore (avoids hydration mismatch)
 const subscribe = (callback: () => void) => {
@@ -117,6 +118,9 @@ export function CmsShell({ activeView, onViewChange, alertCount, children }: She
               </span>
             </Button>
 
+            {/* Theme toggle (Light / Dark / System) */}
+            <ThemeToggle />
+
             {/* Alerts */}
             <Button
               variant="ghost"
@@ -176,7 +180,7 @@ export function CmsShell({ activeView, onViewChange, alertCount, children }: She
                 className={classNames(
                   'w-full flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors',
                   activeView === item.key
-                    ? 'bg-emerald-50 text-emerald-900 border border-emerald-100'
+                    ? 'bg-emerald-50 text-emerald-900 border border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/50'
                     : 'hover:bg-muted text-foreground'
                 )}
               >
@@ -184,7 +188,7 @@ export function CmsShell({ activeView, onViewChange, alertCount, children }: She
                 <div className="flex-1 min-w-0">
                   <div className={classNames(
                     'text-sm font-medium leading-tight',
-                    activeView === item.key && 'text-emerald-700'
+                    activeView === item.key && 'text-emerald-700 dark:text-emerald-300'
                   )}>{item.label}</div>
                   <div className="text-[11px] text-muted-foreground leading-tight mt-0.5">{item.description}</div>
                 </div>
@@ -196,9 +200,9 @@ export function CmsShell({ activeView, onViewChange, alertCount, children }: She
           </nav>
 
           <div className="p-3 border-t">
-            <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-teal-50 p-3 border border-emerald-100">
-              <div className="text-xs font-semibold text-emerald-900 mb-1">Need help?</div>
-              <div className="text-[11px] text-emerald-700 leading-snug mb-2">
+            <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 p-3 border border-emerald-100 dark:border-emerald-900/50">
+              <div className="text-xs font-semibold text-emerald-900 dark:text-emerald-300 mb-1">Need help?</div>
+              <div className="text-[11px] text-emerald-700 dark:text-emerald-400/80 leading-snug mb-2">
                 Check the documentation or contact support for guidance on using CommunityHub.
               </div>
               <Button size="sm" variant="outline" className="w-full h-7 text-xs">View Docs</Button>

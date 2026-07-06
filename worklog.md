@@ -196,3 +196,49 @@ src/app/page.tsx               — Main page with view switching
 - The `isSystem` flag protects the 30 default categories from accidental deletion. Admins can still deactivate them to hide from dropdowns.
 - Categories already in use by records (e.g. a member with category="leader") will keep that raw value even if the category is deleted — they just won't show a friendly label in dropdowns anymore.
 - All category CRUD operations are recorded in the Audit Log.
+
+---
+
+## 2026-07-06 23:50 UTC — Dark Mode (Agent)
+
+**Commit**: (pending push)
+**Type**: feat
+**Scope**: theme, layout
+
+### Changes
+- Added ThemeProvider (next-themes) wrapping the app, defaulting to **dark** theme
+- Built new `ThemeToggle` dropdown component with 3 options: Light, Dark, System
+- Added the toggle button to the header between "Online" status and the Alerts bell
+- Rewrote the dark palette in `globals.css` to be "a little dark" — soft charcoal backgrounds (oklch 0.18-0.225 lightness) with a subtle emerald undertone (hue 162-165) to match the brand, instead of pure grayscale
+- Updated chart colors in dark mode to be more vibrant (emerald, teal, cyan, amber, red)
+- Added 0.3s smooth color transition on body for theme switches
+- Added custom scrollbar styling that adapts to theme
+- Fixed sidebar "Need help?" card and active nav item to use `dark:` variants (emerald-950/40 backgrounds with emerald-300 text) so they look correct in both themes
+- Sonner toaster inherits theme automatically via useTheme() in the existing component
+
+### Files
+- `src/components/theme-provider.tsx` — NEW: next-themes provider wrapper
+- `src/components/theme-toggle.tsx` — NEW: Light/Dark/System dropdown toggle
+- `src/app/layout.tsx` — Wrap children in ThemeProvider, defaultTheme="dark"
+- `src/components/cms/CmsShell.tsx` — Import ThemeToggle, add to header, dark: variants for sidebar
+- `src/app/globals.css` — Rewrote .dark palette with emerald-tinted charcoal, added smooth transition + custom scrollbar
+
+### How it works
+
+- App boots in dark mode by default (`defaultTheme="dark"`)
+- next-themes adds `.dark` class to `<html>` automatically and persists choice in localStorage
+- ThemeToggle dropdown lets user switch between Light / Dark / System at any time
+- All shadcn/ui components automatically adapt because they use `bg-background`, `text-foreground`, `border-border` etc. CSS variables
+- Tailwind `dark:` variants handle the few hardcoded color cases (sidebar gradient card, active nav item)
+
+### Verified via Agent Browser
+- Default load: `document.documentElement.classList.contains('dark')` returns `"DARK"` ✓
+- Toggle to Light: class removed, page switches to light theme ✓
+- Toggle back to Dark: class re-added, page switches back to dark ✓
+- Dashboard, Settings views render correctly in both themes with no console errors
+- Screenshots saved: `dark-mode-default.png`, `light-mode.png`, `dark-mode-final.png`, `dashboard-dark.png`, `settings-dark.png`
+
+### Notes
+- The dark palette uses oklch with hue 162-165 (emerald range) at low chroma (0.008-0.02) so the background isn't pure gray — it has a faint green warmth that pairs with the emerald brand
+- Lightness 0.18 for background and 0.225 for cards makes it "a little dark" rather than pitch black (which would be 0.0)
+- All existing gradient brand colors (from-emerald-500 to-teal-600) work in both themes since they're saturated
