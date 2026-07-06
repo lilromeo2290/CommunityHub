@@ -201,7 +201,7 @@ src/app/page.tsx               — Main page with view switching
 
 ## 2026-07-06 23:50 UTC — Dark Mode (Agent)
 
-**Commit**: (pending push)
+**Commit**: `f8bd189`
 **Type**: feat
 **Scope**: theme, layout
 
