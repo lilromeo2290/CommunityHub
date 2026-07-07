@@ -305,3 +305,71 @@ The permissions matrix displays 18 specific actions across 6 categories with che
 - The 10 seeded community members all have role "member" (visible in the Roles & Permissions tab count)
 - The 5 staff users (admin, leader, project_manager, finance, volunteer) each have role-appropriate permissions
 - All user CRUD operations appear in the Audit Log view with user name, action, and timestamp
+
+---
+
+## 2026-07-07 00:30 UTC — Clear All Data (Agent)
+
+**Commit**: (pending push)
+**Type**: chore
+**Scope**: database
+
+### Changes
+- Created `scripts/clear-data.ts` to wipe all data from the database in correct dependency order
+- Ran the script — cleared:
+  - 16 users (15 seeded + 1 "Test Admin" created during earlier testing)
+  - 15 members
+  - 12 resources
+  - 8 projects
+  - 37 milestones
+  - 10 resource allocations
+  - 15 transactions
+  - 30 contributions
+  - 15 feedback entries
+  - 6 announcements
+  - 7 alerts
+  - 10 audit logs
+  - 31 categories (then re-seeded 30 default categories)
+- Re-seeded the 30 default categories so all dropdowns across the app still work
+- Verified the app handles the empty state gracefully — all views show zeros / "No X found" / empty tables instead of crashing
+- Verified the Settings page still shows all 30 default categories (6/6 + 6/6 + 6/6 + 4/4 + 4/4 + 4/4 = 30 across 6 module types)
+
+### Files
+- `scripts/clear-data.ts` — NEW: Idempotent clear-all script (wipes data, re-seeds default categories)
+- `db/custom.db` — Updated: now contains only the 30 default categories
+
+### Final database state
+```
+users           0
+members         0
+resources       0
+projects        0
+transactions    0
+allocations     0
+announcements   0
+alerts          0
+feedback        0
+contributions   0
+auditLogs       0
+categories      30   ← preserved (system configuration)
+```
+
+### How to use the script
+```bash
+# Clear all data (preserves default categories):
+bun run scripts/clear-data.ts
+
+# Restore demo data after clearing:
+bun run scripts/seed.ts
+```
+
+### Verified via Agent Browser
+- Dashboard loads with all KPIs showing 0, "No needs recorded" placeholder, empty charts (no crashes)
+- Users view shows "No users found. Try adjusting filters or add a new user."
+- Settings page shows all 6 category tabs with 6/6, 6/6, 6/6, 4/4, 4/4, 4/4 active counts
+- All API endpoints return empty arrays / zero counts cleanly (no 500 errors)
+
+### Notes
+- The 30 default categories are intentionally preserved because they are system configuration (needed for dropdowns to work), not user data
+- All shadcn/ui components and custom views handle empty states gracefully — no error boundaries triggered
+- To restore the demo dataset at any time, run `bun run scripts/seed.ts`
